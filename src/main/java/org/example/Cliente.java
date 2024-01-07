@@ -86,7 +86,7 @@ class LaminaMarcoCliente extends JPanel implements ActionListener,Runnable {
                 socketClienteRecibe=socketEscucha.accept();
                 ObjectInputStream flujoEntrada=new ObjectInputStream(socketClienteRecibe.getInputStream());
                 paqueteRecibido=(PaqueteEnvio) flujoEntrada.readObject();
-                taCliente.append("\n" + paqueteRecibido.getNick()" : "+paqueteRecibido.getMensaje()+" para " +paqueteRecibido.getIP());
+                taCliente.append("\n" + paqueteRecibido.getNick()+" : "+paqueteRecibido.getMensaje()+" para " +paqueteRecibido.getIP());
             }
 
         } catch (IOException e) {
