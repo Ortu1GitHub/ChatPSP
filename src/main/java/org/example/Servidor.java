@@ -6,6 +6,7 @@ import java.awt.*;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.*;
 
@@ -44,14 +45,22 @@ class MarcoServidor extends JFrame implements Runnable{
 			String nick,IP,mensaje;
 			PaqueteEnvio datosRecibidos;
 			while (true) {
+				//Socket para recibir de N clientes
 				Socket miSocketServidor = socketServidor.accept();
 				ObjectInputStream flujoEntrada = new ObjectInputStream(miSocketServidor.getInputStream());
 				datosRecibidos=(PaqueteEnvio) flujoEntrada.readObject();
-				miSocketServidor.close();
+				//miSocketServidor.close();
 				nick=datosRecibidos.getNick();
 				IP=datosRecibidos.getIP();
 				mensaje=datosRecibidos.getMensaje();
 				taTexto.append("\n" + nick+" : "+mensaje+" para " +IP);
+
+				//Socket para enviar al cliente con Ip anterior
+				Socket enviaCliente=new Socket(IP,9090);
+				ObjectOutputStream paqueteSalida= new ObjectOutputStream(enviaCliente.getOutputStream());
+				paqueteSalida.writeObject(datosRecibidos);
+
+				enviaCliente.close();
 				miSocketServidor.close();
 			}
 

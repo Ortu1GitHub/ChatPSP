@@ -3,10 +3,7 @@ package org.example;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import  java.net.*;
 
 
@@ -29,7 +26,7 @@ class MarcoCliente extends JFrame {
     }
 }
 
-class LaminaMarcoCliente extends JPanel implements ActionListener {
+class LaminaMarcoCliente extends JPanel implements ActionListener,Runnable {
 
     public LaminaMarcoCliente() {
         tfNick=new JTextField(8);
@@ -45,6 +42,9 @@ class LaminaMarcoCliente extends JPanel implements ActionListener {
         btnEnviar = new JButton("Enviar");
         btnEnviar.addActionListener(this);
         add(btnEnviar);
+
+        Thread hiloCliente=new Thread(this);
+        hiloCliente.start();
     }
 
     @Override
@@ -76,4 +76,23 @@ class LaminaMarcoCliente extends JPanel implements ActionListener {
     public JButton btnEnviar;
     public JTextArea taCliente;
 
+    @Override
+    public void run() {
+        try {
+            ServerSocket socketEscucha=new ServerSocket(9090);
+            Socket socketClienteRecibe;
+            PaqueteEnvio paqueteRecibido;
+            while (true){
+                socketClienteRecibe=socketEscucha.accept();
+                ObjectInputStream flujoEntrada=new ObjectInputStream(socketClienteRecibe.getInputStream());
+                paqueteRecibido=(PaqueteEnvio) flujoEntrada.readObject();
+                taCliente.append("\n" + paqueteRecibido.getNick()" : "+paqueteRecibido.getMensaje()+" para " +paqueteRecibido.getIP());
+            }
+
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
